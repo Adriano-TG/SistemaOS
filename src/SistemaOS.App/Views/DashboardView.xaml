@@ -1,0 +1,458 @@
+<UserControl x:Class="SistemaOS.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SistemaOS.App.Helpers"
+             Language="pt-BR">
+
+    <UserControl.Resources>
+        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <!-- Estilo para o relógio analógico -->
+        <Style x:Key="ClockHandStyle" TargetType="Line">
+            <Setter Property="Stroke" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="StrokeThickness" Value="2"/>
+            <Setter Property="X1" Value="0"/>
+            <Setter Property="Y1" Value="0"/>
+            <Setter Property="StrokeStartLineCap" Value="Round"/>
+            <Setter Property="StrokeEndLineCap" Value="Round"/>
+        </Style>
+
+        <!-- Estilo para os números do relógio -->
+        <Style x:Key="ClockNumberStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="0,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- 0: Título + Botão Atualizar -->
+                <RowDefinition Height="Auto"/> <!-- 1: Calendário + Relógio -->
+                <RowDefinition Height="Auto"/> <!-- 2: KPIs Principais (4 cards) -->
+                <RowDefinition Height="Auto"/> <!-- 3: KPIs Secundários (4 cards) -->
+                <RowDefinition Height="Auto"/> <!-- 4: Gráfico Status + Faturamento 7 dias -->
+                <RowDefinition Height="Auto"/> <!-- 5: Top Clientes + Top Produtos -->
+            </Grid.RowDefinitions>
+
+            <!-- Título + Botão Atualizar -->
+            <Border Grid.Row="0" Margin="0,0,0,16" Padding="16" CornerRadius="12"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Dashboard" FontSize="24"
+                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1" Content="Atualizar"
+                            Command="{Binding AtualizarCommand}"
+                            MinWidth="100" Padding="16,8"
+                            Background="#3498DB" Foreground="White" FontWeight="SemiBold"/>
+                </Grid>
+            </Border>
+
+            <!-- Calendários + Relógio Analógico -->
+            <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>  <!-- Calendário mês atual -->
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>  <!-- Calendário próximo mês -->
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="Auto"/> <!-- Relógio analógico -->
+                </Grid.ColumnDefinitions>
+
+                <!-- Calendário Mês Atual -->
+                <Border Grid.Column="0" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="{Binding MesAtualNome, StringFormat='{}{0:MMMM yyyy}'}"
+                                   FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <Calendar Grid.Row="1"
+                                  DisplayMode="Month"
+                                  DisplayDate="{Binding MesAtualInicio}"
+                                  SelectedDate="{Binding MesAtualInicio}"
+                                  IsTodayHighlighted="True"
+                                  FirstDayOfWeek="Monday"
+                                  Background="Transparent"
+                                  BorderThickness="0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Calendário Próximo Mês -->
+                <Border Grid.Column="2" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="{Binding ProximoMesNome, StringFormat='{}{0:MMMM yyyy}'}"
+                                   FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <Calendar Grid.Row="1"
+                                  DisplayMode="Month"
+                                  DisplayDate="{Binding ProximoMesInicio}"
+                                  SelectedDate="{Binding ProximoMesInicio}"
+                                  IsTodayHighlighted="True"
+                                  FirstDayOfWeek="Monday"
+                                  Background="Transparent"
+                                  BorderThickness="0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Relógio Analógico -->
+                <Border Grid.Column="4" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1"
+                        MinWidth="180" MaxWidth="200">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Hora Atual" FontSize="16" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+
+                        <!-- Canvas do Relógio Analógico -->
+                        <Viewbox Grid.Row="1" Stretch="Uniform" MaxWidth="160" MaxHeight="160">
+                            <Canvas Width="160" Height="160">
+                                <!-- Círculo externo -->
+                                <Ellipse Width="160" Height="160"
+                                         Stroke="{DynamicResource BorderBrushTheme}" StrokeThickness="2"
+                                         Fill="{DynamicResource SurfaceBrush}"/>
+
+                                <!-- Marcadores das horas + Números -->
+                                <Canvas x:Name="HourMarkers" Canvas.Left="80" Canvas.Top="80">
+                                    <Canvas.RenderTransform>
+                                        <TranslateTransform X="-80" Y="-80"/>
+                                    </Canvas.RenderTransform>
+                                    <!-- Números 1 a 12 (raio 60, ângulos 30°; offset -4 p/ 1 dígito, -8 p/ 2 dígitos) -->
+                                    <TextBlock Text="12" Style="{StaticResource ClockNumberStyle}" Canvas.Left="72" Canvas.Top="13" FontSize="14"/>
+                                    <TextBlock Text="1"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="106" Canvas.Top="21" FontSize="14"/>
+                                    <TextBlock Text="2"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="128" Canvas.Top="43" FontSize="14"/>
+                                    <TextBlock Text="3"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="136" Canvas.Top="73" FontSize="14"/>
+                                    <TextBlock Text="4"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="128" Canvas.Top="103" FontSize="14"/>
+                                    <TextBlock Text="5"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="106" Canvas.Top="125" FontSize="14"/>
+                                    <TextBlock Text="6"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="76"  Canvas.Top="133" FontSize="14"/>
+                                    <TextBlock Text="7"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="46"  Canvas.Top="125" FontSize="14"/>
+                                    <TextBlock Text="8"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="24"  Canvas.Top="103" FontSize="14"/>
+                                    <TextBlock Text="9"  Style="{StaticResource ClockNumberStyle}" Canvas.Left="16"  Canvas.Top="73" FontSize="14"/>
+                                    <TextBlock Text="10" Style="{StaticResource ClockNumberStyle}" Canvas.Left="20"  Canvas.Top="43" FontSize="14"/>
+                                    <TextBlock Text="11" Style="{StaticResource ClockNumberStyle}" Canvas.Left="42"  Canvas.Top="21" FontSize="14"/>
+                                </Canvas>
+
+                                <!-- Ponteiro das horas -->
+                                <Line x:Name="HourHand" Style="{StaticResource ClockHandStyle}"
+                                      X2="0" Y2="-40" StrokeThickness="4" Canvas.Left="80" Canvas.Top="80">
+                                    <Line.RenderTransform>
+                                        <RotateTransform CenterX="0" CenterY="0" Angle="{Binding HourHandAngle, Mode=OneWay}"/>
+                                    </Line.RenderTransform>
+                                </Line>
+
+                                <!-- Ponteiro dos minutos -->
+                                <Line x:Name="MinuteHand" Style="{StaticResource ClockHandStyle}"
+                                      X2="0" Y2="-60" StrokeThickness="3" Canvas.Left="80" Canvas.Top="80">
+                                    <Line.RenderTransform>
+                                        <RotateTransform CenterX="0" CenterY="0" Angle="{Binding MinuteHandAngle, Mode=OneWay}"/>
+                                    </Line.RenderTransform>
+                                </Line>
+
+                                <!-- Ponteiro dos segundos -->
+                                <Line x:Name="SecondHand" Style="{StaticResource ClockHandStyle}"
+                                      X2="0" Y2="-70" StrokeThickness="1" Stroke="Red" Canvas.Left="80" Canvas.Top="80">
+                                    <Line.RenderTransform>
+                                        <RotateTransform CenterX="0" CenterY="0" Angle="{Binding SecondHandAngle, Mode=OneWay}"/>
+                                    </Line.RenderTransform>
+                                </Line>
+
+                                <!-- Centro do relógio -->
+                                <Ellipse Width="12" Height="12" Fill="{DynamicResource AccentBrush}"
+                                         Canvas.Left="74" Canvas.Top="74"/>
+                            </Canvas>
+                        </Viewbox>
+
+                        <!-- Hora digital abaixo do relógio -->
+                        <TextBlock Grid.Row="2" x:Name="DigitalClock" Text="{Binding HoraAtualFormatada}"
+                                   FontSize="20" FontWeight="Bold" FontFamily="Consolas"
+                                   HorizontalAlignment="Center" Margin="0,12,0,0"
+                                   Foreground="{DynamicResource AccentBrush}"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- KPIs Principais - 4 Cards -->
+            <Grid Grid.Row="2" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Total Ordens Mês -->
+                <Border Grid.Column="0" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource AccentBrush}">
+                    <StackPanel>
+                        <TextBlock Text="Ordens no Mês" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
+                        <TextBlock Text="{Binding TotalOrdensMes}" Foreground="White" FontWeight="Bold" FontSize="28" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Faturamento Mês -->
+                <Border Grid.Column="2" Padding="16" CornerRadius="12" Background="#27AE60">
+                    <StackPanel>
+                        <TextBlock Text="Faturamento Mês" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
+                        <TextBlock Text="{Binding FaturamentoMesFormatado}" Foreground="White" FontWeight="Bold" FontSize="28" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Ticket Médio -->
+                <Border Grid.Column="4" Padding="16" CornerRadius="12" Background="#F39C12">
+                    <StackPanel>
+                        <TextBlock Text="Ticket Médio" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
+                        <TextBlock Text="{Binding TicketMedioFormatado}" Foreground="White" FontWeight="Bold" FontSize="28" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- SLA % -->
+                <Border Grid.Column="6" Padding="16" CornerRadius="12" Background="#8E44AD">
+                    <StackPanel>
+                        <TextBlock Text="SLA Cumprimento" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
+                        <TextBlock Text="{Binding SlaFormatado}" Foreground="White" FontWeight="Bold" FontSize="28" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- KPIs Secundários - 4 Cards -->
+            <Grid Grid.Row="3" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Ordens Abertas -->
+                <Border Grid.Column="0" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Abertas" Style="{StaticResource Rotulo}" Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding OrdensAbertas}" Foreground="{DynamicResource TextBrush}" FontWeight="Bold" FontSize="24" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Em Andamento -->
+                <Border Grid.Column="2" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Em Andamento" Style="{StaticResource Rotulo}" Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding OrdensEmAndamento}" Foreground="#F39C12" FontWeight="Bold" FontSize="24" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Prontas -->
+                <Border Grid.Column="4" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Prontas" Style="{StaticResource Rotulo}" Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding OrdensProntas}" Foreground="#3498DB" FontWeight="Bold" FontSize="24" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Clientes Ativos -->
+                <Border Grid.Column="6" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Clientes Ativos" Style="{StaticResource Rotulo}" Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding ClientesAtivos}" Foreground="#27AE60" FontWeight="Bold" FontSize="24" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Gráficos: Status + Faturamento 7 dias -->
+            <Grid Grid.Row="4" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Ordens por Status -->
+                <Border Grid.Column="0" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Ordens por Status" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding OrdensPorStatus}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  HeadersVisibility="Column" RowHeaderWidth="0"
+                                  MaxHeight="200" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+                                <DataGridTextColumn Header="Quantidade" Binding="{Binding Count}" Width="100">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <!-- Faturamento últimos 7 dias -->
+                <Border Grid.Column="2" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Faturamento (últimos 7 dias)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding FaturamentoUltimos7Dias}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  HeadersVisibility="Column" RowHeaderWidth="0"
+                                  MaxHeight="200" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Dia" Binding="{Binding DataFormatada}" Width="*">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat='R$ {0:N2}'}" Width="120">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Top Clientes + Top Produtos -->
+            <Grid Grid.Row="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Top 5 Clientes -->
+                <Border Grid.Column="0" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Top 5 Clientes (Faturamento)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding TopClientes}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  HeadersVisibility="Column" RowHeaderWidth="0"
+                                  MaxHeight="250" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Cliente" Binding="{Binding Nome}" Width="*"/>
+                                <DataGridTextColumn Header="Faturado" Binding="{Binding TotalFormatado}" Width="120">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="OS" Binding="{Binding QuantidadeOrdens}" Width="60">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <!-- Top 5 Produtos -->
+                <Border Grid.Column="2" Padding="16" CornerRadius="12"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Top 5 Produtos (Quantidade)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding TopProdutos}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  HeadersVisibility="Column" RowHeaderWidth="0"
+                                  MaxHeight="250" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Produto" Binding="{Binding Nome}" Width="*"/>
+                                <DataGridTextColumn Header="Qtd" Binding="{Binding QuantidadeVendida, StringFormat='N0'}" Width="60">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Faturado" Binding="{Binding TotalFormatado}" Width="120">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,80 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaOS.Core\SistemaOS.Core.csproj" />
+    <ProjectReference Include="..\SistemaOS.Infrastructure\SistemaOS.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="FluentValidation" Version="12.2.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="QuestPDF" Version="2026.9.1" />
+    <PackageReference Include="Serilog" Version="4.4.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="App.xaml.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="MainWindow.xaml.cs" />
+    <Compile Include="Helpers\Class1.csFormatadorMascara.cs" />
+    <Compile Include="Helpers\Converters.cs" />
+    <Compile Include="Helpers\FormatadorTexto.cs" />
+    <Compile Include="Helpers\MensagensGlobais.cs" />
+    <Compile Include="Services\IThemeService.cs" />
+    <Compile Include="Services\PdfService.cs" />
+    <Compile Include="Services\ThemeService.cs" />
+    <Compile Include="Services\WpfThemeApplier.cs" />
+    <Compile Include="ViewModels\ClientesViewModel.cs" />
+    <Compile Include="ViewModels\ConfiguracoesViewModel.cs" />
+    <Compile Include="ViewModels\DashboardViewModel.cs" />
+    <Compile Include="ViewModels\EmConstrucaoViewModel.cs" />
+    <Compile Include="ViewModels\EstoqueViewModel.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\OrdensViewModel.cs" />
+    <Compile Include="ViewModels\PdvViewModel.cs" />
+    <Compile Include="Views\ClientesView.xaml.cs" />
+    <Compile Include="Views\PdvView.xaml.cs" />
+    <Compile Include="Views\ConfiguracoesView.xaml.cs" />
+    <Compile Include="Views\DashboardView.xaml.cs" />
+    <Compile Include="Views\EmConstrucaoView.xaml.cs" />
+    <Compile Include="Views\EstoqueView.xaml.cs" />
+    <Compile Include="Views\LoginView.xaml.cs" />
+    <Compile Include="Views\OrdensView.xaml.cs" />
+    <Compile Include="ViewModels\TrocaSenhaViewModel.cs" />
+    <Compile Include="Views\TrocaSenhaView.xaml.cs" />
+    <Compile Include="ViewModels\UsuariosViewModel.cs" />
+    <Compile Include="Views\UsuariosView.xaml.cs" />
+    <Compile Include="Validators\ClienteValidator.cs" />
+    <Compile Include="Validators\ProdutoValidator.cs" />
+    <Compile Include="Validators\OrdemServicoValidator.cs" />
+    <Compile Include="Validators\UsuarioValidator.cs" />
+  </ItemGroup>
+
+</Project>

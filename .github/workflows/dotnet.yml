@@ -1,0 +1,159 @@
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  SOLUTION_FILE: 'SistemaOS.slnx'
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        cache: true
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+    - name: Build solution
+      run: dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test ${{ env.SOLUTION_FILE }} --no-build --configuration Release --verbosity normal
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: tests/**/TestResults/*.trx
+        retention-days: 7
+
+  # Job: Coverage Report
+  coverage:
+    needs: build-and-test
+    runs-on: windows-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        cache: true
+
+    - name: Run tests with coverage
+      run: |
+        dotnet test ${{ env.SOLUTION_FILE }} \
+          --configuration Release \
+          --no-build \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./coverage \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+    - name: Generate coverage report
+      run: |
+        dotnet tool install --global dotnet-reportgenerator-globaltool
+        reportgenerator \
+          -reports:"./coverage/**/coverage.opencover.xml" \
+          -targetdir:"./coverage-report" \
+          -reporttypes:"Html;Cobertura;TextSummary"
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: ./coverage-report
+        retention-days: 14
+
+    - name: Comment coverage on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          // Ler o summary do coverage
+          const summaryPath = './coverage-report/Summary.txt';
+          if (fs.existsSync(summaryPath)) {
+            const summary = fs.readFileSync(summaryPath, 'utf8');
+
+            // Extrair linha de cobertura total
+            const lines = summary.split('\n');
+            const coverageLine = lines.find(l => l.includes('Line coverage'));
+
+            if (coverageLine) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 📊 Code Coverage Report\n\n${coverageLine}\n\n[Ver relatório completo](${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+              });
+            }
+          }
+
+  # Job: SonarCloud Analysis
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: windows-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    needs: build-and-test
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Necessário para análise de histórico do SonarCloud
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        cache: true
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+    - name: Build solution
+      run: dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration Release
+
+    - name: Install SonarScanner
+      run: dotnet tool install --global dotnet-sonarscanner
+
+    - name: Run SonarCloud Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        dotnet sonarscanner begin \
+          /k:"${{ github.repository }}" \
+          /o:"${{ github.repository_owner }}" \
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.host.url="https://sonarcloud.io" \
+          /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+          /d:sonar.exclusions="**/Migrations/**,**/obj/**,**/bin/**" \
+          /d:sonar.cs.vstest.reportsPaths="**/*.trx"
+
+        dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration Release
+
+        dotnet test ${{ env.SOLUTION_FILE }} --no-build --configuration Release \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./coverage \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+        dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

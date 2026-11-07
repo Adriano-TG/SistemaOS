@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SistemaOS.App/SistemaOS.App.csproj" />
+    <Project Path="src/SistemaOS.Core/SistemaOS.Core.csproj" />
+    <Project Path="src/SistemaOS.Infrastructure/SistemaOS.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SistemaOS.Tests/SistemaOS.Tests.csproj" />
+  </Folder>
+</Solution>

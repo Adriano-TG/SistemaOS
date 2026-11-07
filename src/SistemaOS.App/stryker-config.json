@@ -1,0 +1,23 @@
+{
+  "stryker-config": {
+    "mutate": [
+      "*.cs",
+      "ViewModels/**/*.cs",
+      "Views/**/*.cs",
+      "Services/**/*.cs",
+      "Helpers/**/*.cs"
+    ],
+    "ignore-mutations": [
+      "obj/**"
+    ],
+    "test-projects": ["..\\..\\tests\\SistemaOS.Tests\\SistemaOS.Tests.csproj"],
+    "reporters": ["html", "dots"],
+    "mutation-level": "standard",
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 0
+    },
+    "concurrency": 4
+  }
+}

@@ -1,0 +1,210 @@
+﻿<UserControl x:Class="SistemaOS.App.Views.ConfiguracoesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- ScrollViewer garante que cabe tudo no ecrã -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,16,0">
+        <StackPanel>
+            <TextBlock Text="Configurações do Sistema" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,24"/>
+
+            <!-- APARÊNCIA -->
+            <Border Padding="20" Margin="0,0,0,16" CornerRadius="12" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Aparência" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Tema" Style="{StaticResource Rotulo}"/>
+                            <ComboBox x:Name="TemaComboBox" Width="200" HorizontalAlignment="Left"
+                                      SelectedIndex="{Binding TemaSelecionado, Mode=TwoWay}"
+                                      ItemsSource="{Binding TemasDisponiveis}"
+                                      DisplayMemberPath="Nome"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Cor de Destaque" Style="{StaticResource Rotulo}"/>
+                            <ComboBox x:Name="CorComboBox" Width="200" HorizontalAlignment="Left"
+                                      SelectedIndex="{Binding CorSelecionadaIndex, Mode=TwoWay}"
+                                      ItemsSource="{Binding CoresDisponiveis}"
+                                      DisplayMemberPath="Nome"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Pré-visualização das cores -->
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Pré-visualização: " VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}"/>
+                        <Border Width="40" Height="30" CornerRadius="4" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- MEU NEGÓCIO (A T ELETROTEC) -->
+            <Border Padding="20" Margin="0,0,0,16" CornerRadius="12" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Dados da Empresa" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Coluna do Logótipo -->
+                        <StackPanel Grid.Column="0">
+                            <!-- O Border abaixo cria uma "moldura" para a imagem -->
+                            <Border Width="140" Height="140" CornerRadius="8" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1" Background="#11000000" Margin="0,0,0,12">
+                                <Image Source="{Binding CaminhoLogo}" Stretch="Uniform" Margin="4"/>
+                            </Border>
+                            <Button Content="Procurar Logótipo" Command="{Binding SelecionarLogoCommand}"/>
+                        </StackPanel>
+
+                        <!-- Coluna dos Dados Empresariais -->
+                        <StackPanel Grid.Column="2">
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="CNPJ" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding Cnpj, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Razão Social" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding RazaoSocial, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Nome Fantasia" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding NomeFantasia, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Telefone" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding TelefoneEmpresa, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="CEP" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding CepEmpresa, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Rua/Avenida" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding LogradouroEmpresa, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="Número" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding NumeroEmpresa, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Segunda linha: Bairro, Cidade, UF -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Bairro" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding BairroEmpresa, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Cidade" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding CidadeEmpresa, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="UF" Style="{StaticResource Rotulo}"/>
+                                    <TextBox Text="{Binding UfEmpresa, UpdateSourceTrigger=PropertyChanged}" Width="80" HorizontalAlignment="Left"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding Mensagem}" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
+                                <Button Content="Salvar" Command="{Binding SalvarEmpresaCommand}" Width="120" Background="{DynamicResource AccentBrush}" Foreground="White" FontWeight="Bold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- CONFIGURAÇÕES DE IMPRESSÃO -->
+            <Border Padding="20" Margin="0,0,0,16" CornerRadius="12" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Configurações de Impressão" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Formato da O.S." Style="{StaticResource Rotulo}"/>
+                            <ComboBox ItemsSource="{Binding OpcoesTipoOs}" SelectedIndex="{Binding TipoOsSelecionado}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Orientação do Papel" Style="{StaticResource Rotulo}"/>
+                            <ComboBox ItemsSource="{Binding OpcoesOrientacao}"
+                             SelectedIndex="{Binding OrientacaoSelecionada}"
+                            IsEnabled="{Binding PermiteOrientacao}"
+                             ToolTip="Disponível apenas para folha A4"
+                             ToolTipService.ShowOnDisabled="True"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Tamanho do Papel" Style="{StaticResource Rotulo}"/>
+                            <ComboBox ItemsSource="{Binding OpcoesTamanhoPapel}" SelectedIndex="{Binding TamanhoPapelSelecionado}"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- AVANÇADO / MANUTENÇÃO -->
+            <Border Padding="20" Margin="0,0,0,16" CornerRadius="12" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Avançado / Manutenção" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Formatação Automática de Texto:" Style="{StaticResource Rotulo}"/>
+                    <ComboBox ItemsSource="{Binding OpcoesFormato}" SelectedIndex="{Binding FormatoSelecionadoIndex}" Width="250" HorizontalAlignment="Left" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Migração de Dados Antigos:" Style="{StaticResource Rotulo}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Importar Clientes Legado" Command="{Binding ImportarLegadoCommand}" Width="200" Margin="0,0,8,0"/>
+
+                        <!-- 👇 NOVO BOTÃO DE EXPORTAR AQUI 👇 -->
+                        <Button Content="Exportar Banco p/ Excel" Command="{Binding ExportarLegadoParaExcelCommand}" Width="200" Margin="0,0,8,0" Background="#107C41" Foreground="White" FontWeight="Bold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

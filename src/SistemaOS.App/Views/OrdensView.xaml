@@ -1,0 +1,211 @@
+﻿<UserControl x:Class="SistemaOS.App.Views.OrdensView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- 👇 ENVOLVEMOS TUDO NO SCROLLVIEWER PARA TER BARRA DE ROLAGEM 👇 -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
+
+        <Grid Margin="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- 0: Título e Botões Superiores -->
+                <RowDefinition Height="Auto"/>
+                <!-- 1: Formulário de O.S. -->
+                <RowDefinition Height="Auto"/>
+                <!-- 2: Formulário de Itens / Peças -->
+                <RowDefinition Height="Auto"/>
+                <!-- 3: Barra de Pesquisa -->
+                <RowDefinition Height="Auto"/>
+                <!-- 4: Tabela de Histórico de O.S. -->
+            </Grid.RowDefinitions>
+
+            <!-- CABEÇALHO E AÇÕES GERAIS -->
+            <Grid Grid.Row="0" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding Titulo}" FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Nova O.S." Command="{Binding NovaCommand}" Width="100" Margin="0,0,8,0"/>
+                    <Button Content="Imprimir O.S." Command="{Binding ImprimirOrdemCommand}" Width="120" Margin="0,0,8,0"/>
+                    <Button Content="Imprimir Laudo" Command="{Binding ImprimirLaudoCommand}" Width="120"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- FORMULÁRIO DA ORDEM DE SERVIÇO -->
+            <Border Grid.Row="1" Margin="0,0,0,16" Padding="16" CornerRadius="12" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                <StackPanel>
+                    <!-- Linha 1: Cliente e Status -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="491*"/>
+                            <ColumnDefinition Width="108*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="2">
+                            <TextBlock Text="Cliente" Style="{StaticResource Rotulo}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ComboBox Grid.Column="0" ItemsSource="{Binding Clientes}" 
+                                          SelectedItem="{Binding ClienteSelecionado}" 
+                                          DisplayMemberPath="Nome"/>
+
+                                <Button Grid.Column="1" Content="+" Command="{Binding CadastrarNovoClienteCommand}" 
+                                        Width="35" Margin="4,0,0,0" ToolTip="Cadastrar novo cliente rápido" FontWeight="Bold"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Linha 2: Aparelho -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Equipamento (Ex: Liquidificador, Aspirador)" Style="{StaticResource Rotulo}"/>
+                            <TextBox Text="{Binding Equipamento, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Marca (Mondial, Wap, etc)" Style="{StaticResource Rotulo}"/>
+                            <TextBox Text="{Binding Marca, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Nº de Série" Style="{StaticResource Rotulo}"/>
+                            <TextBox Text="{Binding NumeroSerie, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <CheckBox Grid.Column="6" Content="Em Garantia?" 
+                                  IsChecked="{Binding EmGarantia}" 
+                                  VerticalAlignment="Bottom" Margin="0,0,0,8"/>
+                    </Grid>
+
+                    <!-- Linha 3: Defeito e Laudo -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Defeito Relatado pelo Cliente" Style="{StaticResource Rotulo}"/>
+                            <TextBox Text="{Binding DefeitoRelatado, UpdateSourceTrigger=PropertyChanged}" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Laudo Técnico (Diagnóstico)" Style="{StaticResource Rotulo}"/>
+                            <TextBox Text="{Binding LaudoTecnico, UpdateSourceTrigger=PropertyChanged}" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- SEÇÃO DE PEÇAS / SERVIÇOS (ITENS) -->
+            <Border Grid.Row="2" Margin="0,0,0,16" Padding="16" CornerRadius="12" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Peças e Serviços" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" Text="{Binding NovoItemDescricao, UpdateSourceTrigger=PropertyChanged}" ToolTip="Descrição da Peça/Serviço"/>
+                        <TextBox Grid.Column="2" Text="{Binding NovoItemQuantidade, UpdateSourceTrigger=PropertyChanged}" ToolTip="Qtd."/>
+                        <TextBox Grid.Column="4" Text="{Binding NovoItemValor, UpdateSourceTrigger=PropertyChanged}" ToolTip="Valor Unitário"/>
+                        <Button Grid.Column="6" Content="Adicionar" Command="{Binding AdicionarItemCommand}"/>
+                    </Grid>
+
+                    <!-- Tabela de Peças adicionadas a esta O.S. -->
+                    <DataGrid ItemsSource="{Binding ItensForm}" SelectedItem="{Binding ItemSelecionado}" AutoGenerateColumns="False" IsReadOnly="True" Height="150" Margin="0,0,0,8">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
+                            <DataGridTextColumn Header="Qtd." Binding="{Binding Quantidade}" Width="80"/>
+                            <DataGridTextColumn Header="V. Unitário" Binding="{Binding ValorUnitario, StringFormat={}{0:C}}" Width="100"/>
+                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:C}}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Totais e Salvar -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Content="Remover Peça Selecionada" Command="{Binding RemoverItemCommand}" Foreground="#E74C3C" Background="Transparent" BorderThickness="1" BorderBrush="#E74C3C"/>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Total da O.S.: " FontSize="16" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding TotalForm, StringFormat={}{0:C}}" FontSize="18" FontWeight="Bold" Foreground="#00B894" Margin="0,0,24,0"/>
+
+                            <TextBlock Text="{Binding Mensagem}" VerticalAlignment="Center" Margin="0,0,12,0" Foreground="{DynamicResource AccentBrush}"/>
+                            <Button Content="Salvar Ordem de Serviço" Command="{Binding SalvarCommand}" Width="180" Background="{DynamicResource AccentBrush}" Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- BARRA DE PESQUISA -->
+            <Border Grid.Row="3" Background="White" CornerRadius="8" Padding="10" Margin="0,0,0,16" BorderBrush="#CCCCCC" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="🔎" Foreground="#0078D7" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+                    <TextBox Grid.Column="1" 
+                             Text="{Binding TextoPesquisa, UpdateSourceTrigger=PropertyChanged}" 
+                             Padding="5" 
+                             FontSize="14"
+                             VerticalContentAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- HISTÓRICO GERAL DE ORDENS -->
+            <DataGrid Grid.Row="4" Height="350"
+                      ItemsSource="{Binding Ordens}"
+                      SelectedItem="{Binding OrdemSelecionada, Mode=TwoWay}"
+                      AutoGenerateColumns="False" IsReadOnly="True"
+                      EnableRowVirtualization="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Nº O.S." Binding="{Binding Id}" Width="80"/>
+                    <DataGridTextColumn Header="Data" Binding="{Binding DataAbertura, StringFormat={}{0:dd/MM/yyyy}}" Width="100"/>
+                    <DataGridTextColumn Header="Cliente" Binding="{Binding Cliente.Nome}" Width="250"/>
+                    <DataGridTextColumn Header="Equipamento" Binding="{Binding Equipamento}" Width="*"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </Grid>
+    </ScrollViewer>
+</UserControl>

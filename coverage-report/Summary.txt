@@ -1,0 +1,61 @@
+Summary
+  Generated on: 02/11/2026 - 14:53:58
+  Parser: OpenCover
+  Assemblies: 3
+  Classes: 36
+  Files: 50
+  Line coverage: 31.4%
+  Covered lines: 729
+  Uncovered lines: 1589
+  Coverable lines: 2318
+  Total lines: 4738
+  Branch coverage: 50.7% (261 of 514)
+  Covered branches: 261
+  Total branches: 514
+  Method coverage: 57.4% (120 of 209)
+  Full method coverage: 50.7% (106 of 209)
+  Covered methods: 120
+  Fully covered methods: 106
+  Total methods: 209
+
+SistemaOS.App                                                             64%
+  SistemaOS.App.App                                                        0%
+  SistemaOS.App.Helpers.ClienteSalvoMessage                                0%
+  SistemaOS.App.Helpers.FormatadorMascara                               37.5%
+  SistemaOS.App.Helpers.FormatadorTexto                                    0%
+  SistemaOS.App.Helpers.MudarTelaMessage                                 100%
+  SistemaOS.App.MainWindow                                                 0%
+  SistemaOS.App.Services.ConfiguracoesGlobais                            100%
+  SistemaOS.App.Services.ConfiguracoesTema                               100%
+  SistemaOS.App.Services.PdfService                                       70%
+  SistemaOS.App.Services.ThemeService                                   22.8%
+  SistemaOS.App.ViewModels.ClientesViewModel                            82.6%
+  SistemaOS.App.ViewModels.ConfiguracoesViewModel                       61.2%
+  SistemaOS.App.ViewModels.EmConstrucaoViewModel                         100%
+  SistemaOS.App.ViewModels.MainViewModel                                85.1%
+  SistemaOS.App.ViewModels.OrdensViewModel                              81.3%
+  SistemaOS.App.Views.ClientesView                                         0%
+  SistemaOS.App.Views.ConfiguracoesView                                    0%
+  SistemaOS.App.Views.EmConstrucaoView                                     0%
+  SistemaOS.App.Views.OrdensView                                           0%
+
+SistemaOS.Core                                                          89.1%
+  SistemaOS.Core.Entities.Cliente                                        100%
+  SistemaOS.Core.Entities.Empresa                                        100%
+  SistemaOS.Core.Entities.ItemOS                                        66.6%
+  SistemaOS.Core.Entities.OrdemServico                                   100%
+  SistemaOS.Core.Interfaces.EnderecoCep                                    0%
+  SistemaOS.Core.Validations.DocumentoValidator                          100%
+
+SistemaOS.Infrastructure                                                 3.1%
+  SistemaOS.Infrastructure.Data.AppDbContext                             100%
+  SistemaOS.Infrastructure.Migrations.AdicionarConfiguracoesImpressao      0%
+  SistemaOS.Infrastructure.Migrations.AdicionarTabelaEmpresa               0%
+  SistemaOS.Infrastructure.Migrations.AdicionarWhatsApp                    0%
+  SistemaOS.Infrastructure.Migrations.AppDbContextModelSnapshot            0%
+  SistemaOS.Infrastructure.Migrations.CriarTabelaEmpresa                   0%
+  SistemaOS.Infrastructure.Migrations.Inicial                              0%
+  SistemaOS.Infrastructure.Services.CnpjService                         76.9%
+  SistemaOS.Infrastructure.Services.MigracaoService                        3%
+  SistemaOS.Infrastructure.Services.RetornoCnpj                            0%
+  SistemaOS.Infrastructure.Services.ViaCepService                          0%

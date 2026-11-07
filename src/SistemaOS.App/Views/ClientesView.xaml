@@ -1,0 +1,192 @@
+﻿<UserControl x:Class="SistemaOS.App.Views.ClientesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:helpers="clr-namespace:SistemaOS.App.Helpers"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <helpers:BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </UserControl.Resources>
+    
+    <Grid Margin="0,0,12,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- 0: Título -->
+            <RowDefinition Height="Auto"/>
+            <!-- 1: Formulário -->
+            <RowDefinition Height="Auto"/>
+            <!-- 2: Barra de Pesquisa -->
+            <RowDefinition Height="*"/>
+            <!-- 3: DataGrid -->
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Registo de Clientes" FontSize="24"
+                   FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+        <!-- Formulário de Registo -->
+        <Border Grid.Row="1" Margin="0,0,0,16" Padding="16" CornerRadius="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrushTheme}" BorderThickness="1">
+            <StackPanel>
+
+                <!-- Linha 1: Dados Pessoais -->
+                <!-- Linha 1: Dados Pessoais -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="140"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Nome do Cliente" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Nome, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="CPF / CNPJ" Style="{StaticResource Rotulo}"/>
+                        <!-- 👇 MÁSCARA ATIVADA 👇 -->
+                        <TextBox Text="{Binding CpfCnpj, UpdateSourceTrigger=PropertyChanged}"
+                                 helpers:FormatadorMascara.Tipo="CpfCnpj"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="4">
+                        <TextBlock Text="WhatsApp" Style="{StaticResource Rotulo}"/>
+                        <!-- 👇 MÁSCARA ATIVADA 👇 -->
+                        <TextBox Text="{Binding WhatsApp, UpdateSourceTrigger=PropertyChanged}"
+                                 helpers:FormatadorMascara.Tipo="Telefone"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="6">
+                        <TextBlock Text="Telefone Fixo" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Telefone, UpdateSourceTrigger=PropertyChanged}"
+                                 helpers:FormatadorMascara.Tipo="Telefone"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Linha 2: Endereço (Parte 1) -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="CEP" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Cep, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Logradouro (Rua/Av)" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Logradouro, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="4">
+                        <TextBlock Text="Número" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Numero, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="6">
+                        <TextBlock Text="Complemento" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Complemento, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Linha 3: Endereço (Parte 2) e Botões -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Bairro" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Bairro, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Cidade" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Cidade, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="4">
+                        <TextBlock Text="UF" Style="{StaticResource Rotulo}"/>
+                        <TextBox Text="{Binding Uf, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <!-- Parte dos Botões com o botão Excluir -->
+                    <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <TextBlock Text="{Binding Mensagem}" VerticalAlignment="Center" Margin="0,0,12,0"
+                                   Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
+
+                        <!-- Botão Selecionar (visível em modo seleção PDV) -->
+                        <Button Content="✓ Selecionar" Command="{Binding SelecionarCommand}"
+                                CommandParameter="{Binding ClienteSelecionado}"
+                                Width="100" Margin="0,0,8,0"
+                                Background="#00B894" Foreground="White" FontWeight="SemiBold"
+                                Visibility="{Binding EmModoSelecaoPdv, Converter={StaticResource BoolToVisibility}}"/>
+                        <!-- Botão Selecionar (visível em modo seleção OS) -->
+                        <Button Content="✓ Selecionar" Command="{Binding SelecionarCommand}"
+                                CommandParameter="{Binding ClienteSelecionado}"
+                                Width="100" Margin="0,0,8,0"
+                                Background="#00B894" Foreground="White" FontWeight="SemiBold"
+                                Visibility="{Binding EmModoSelecaoOS, Converter={StaticResource BoolToVisibility}}"/>
+
+                        <Button Content="Excluir" Command="{Binding ExcluirCommand}"
+                                Width="80" Margin="0,0,8,0"
+                                Background="#E74C3C" Foreground="White" FontWeight="SemiBold"/>
+
+                        <Button Content="Salvar Cliente" Command="{Binding SalvarCommand}" Width="120"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Barra de Pesquisa -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="400"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Pesquisar Cliente:" VerticalAlignment="Center" 
+                       Margin="0,0,8,0" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+
+            <TextBox Grid.Column="1" Text="{Binding TextoPesquisa, UpdateSourceTrigger=PropertyChanged}" 
+                     ToolTip="Pesquise por Nome ou CPF/CNPJ"/>
+        </Grid>
+
+        <!-- Tabela de Clientes -->
+        <DataGrid Grid.Row="3"
+                  ItemsSource="{Binding Clientes}"
+                  SelectedItem="{Binding ClienteSelecionado, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True">
+
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" 
+                              Command="{Binding EditarCommand}" 
+                              CommandParameter="{Binding ClienteSelecionado}" />
+            </DataGrid.InputBindings>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="*"/>
+                <DataGridTextColumn Header="CPF/CNPJ" Binding="{Binding CpfCnpj}" Width="130"/>
+                <DataGridTextColumn Header="Telefone" Binding="{Binding Telefone}" Width="120"/>
+                <DataGridTextColumn Header="Endereço" Binding="{Binding Endereco}" Width="250"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

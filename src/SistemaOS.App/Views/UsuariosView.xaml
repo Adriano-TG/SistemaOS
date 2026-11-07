@@ -1,0 +1,400 @@
+<Window x:Class="SistemaOS.App.Views.UsuariosView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SistemaOS.App.ViewModels"
+        xmlns:helpers="clr-namespace:SistemaOS.App.Helpers"
+        xmlns:core="clr-namespace:SistemaOS.Core.Entities;assembly=SistemaOS.Core"
+        mc:Ignorable="d"
+        Title="Gerenciar Usuários - Sistema OS"
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBrush}"
+        Foreground="{DynamicResource TextBrush}">
+
+    <Window.Resources>
+        <helpers:BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushTheme}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="8" />
+        </Style>
+
+        <Style x:Key="InputLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
+        <Style x:Key="InputField" TargetType="TextBox">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushTheme}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}" />
+        </Style>
+
+        <Style x:Key="PasswordField" TargetType="PasswordBox" BasedOn="{StaticResource InputField}" />
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Height" Value="42" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="24,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushTheme}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#E74C3C" />
+        </Style>
+
+        <DataTemplate x:Key="RoleTemplate">
+            <TextBlock Text="{Binding}"
+                       Foreground="{DynamicResource TextBrush}"
+                       FontWeight="Medium" />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Painel Esquerdo: Lista de Usuários -->
+        <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Cabeçalho -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+                    <TextBlock Text="👥 Usuários do Sistema"
+                               FontSize="20" FontWeight="Bold"
+                               Foreground="{DynamicResource TextBrush}"
+                               VerticalAlignment="Center" />
+                    <Button Grid.Row="0" HorizontalAlignment="Right"
+                            Command="{Binding NovoCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            Padding="16,8" FontSize="13"
+                            ToolTip="Novo usuário (Ctrl+N)">
+                        ➕ Novo
+                    </Button>
+                </StackPanel>
+
+                <!-- Busca -->
+                <TextBox Grid.Row="1"
+                         Text="{Binding TextoPesquisa, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                         Style="{StaticResource InputField}"
+                         Padding="12,10,40,10"
+                         Margin="0,0,0,12"
+                         Tag="🔍 Buscar por nome ou login...">
+                    <TextBox.Template>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6"
+                                    SnapsToDevicePixels="True">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="🔍"
+                                               VerticalAlignment="Center"
+                                               Margin="12,0,8,0"
+                                               Foreground="{DynamicResource TextMutedBrush}"
+                                               FontSize="16"
+                                               Visibility="{Binding Text.IsEmpty, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}" />
+                                    <ScrollViewer x:Name="PART_ContentHost"
+                                                  Grid.Column="1"
+                                                  Focusable="False"
+                                                  HorizontalScrollBarVisibility="Hidden"
+                                                  VerticalScrollBarVisibility="Hidden"
+                                                  Padding="{TemplateBinding Padding}"
+                                                  Foreground="{TemplateBinding Foreground}"
+                                                  Background="Transparent" />
+                                </Grid>
+                            </Border>
+                        </ControlTemplate>
+                    </TextBox.Template>
+                </TextBox>
+
+                <!-- Lista -->
+                <ListView Grid.Row="2"
+                          ItemsSource="{Binding Usuarios}"
+                          SelectedItem="{Binding UsuarioSelecionada, Mode=TwoWay}"
+                          Margin="0,0,0,12"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          VirtualizingPanel.IsVirtualizing="True">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="12,10" />
+                            <Setter Property="Margin" Value="0,2" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushTheme}" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <Border x:Name="Border"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                Padding="{TemplateBinding Padding}"
+                                                SnapsToDevicePixels="True">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                                <Setter TargetName="Border" Property="BorderThickness" Value="0" />
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding Nome}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextBrush}" />
+                                    <TextBlock Text="{Binding Login}"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextMutedBrush}"
+                                               Margin="0,2,0,0" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <Border Background="{DynamicResource AccentBrush}"
+                                                CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                            <TextBlock Text="{Binding Role}"
+                                                       FontSize="11" FontWeight="Bold"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="{Binding Ativo, Converter={StaticResource BoolToVisibility}, ConverterParameter=#27AE60|#E74C3C}"
+                                                CornerRadius="4" Padding="6,2">
+                                            <TextBlock Text="{Binding Ativo, Converter={StaticResource BoolToVisibility}, ConverterParameter=Ativo|Inativo}"
+                                                       FontSize="11" FontWeight="Medium" Foreground="White" />
+                                        </Border>
+                                        <Border Background="#F39C12"
+                                                CornerRadius="4" Padding="6,2" Margin="8,0,0,0"
+                                                Visibility="{Binding PrimeiroLogin, Converter={StaticResource BoolToVisibility}}">
+                                            <TextBlock Text="🔑 1º Login"
+                                                       FontSize="10" FontWeight="Bold" Foreground="White" />
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding DataCadastro, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextMutedBrush}"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Ações rápidas -->
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="🔄 Resetar Senha"
+                            Command="{Binding ResetarSenhaCommand}"
+                            Style="{StaticResource SecondaryButton}"
+                            IsEnabled="{Binding UsuarioSelecionada, Converter={StaticResource BoolToVisibility}}"
+                            Margin="0,0,8,0" />
+                    <Button Content="🗑️ Excluir"
+                            Command="{Binding ExcluirCommand}"
+                            Style="{StaticResource DangerButton}"
+                            IsEnabled="{Binding UsuarioSelecionada, Converter={StaticResource BoolToVisibility}}"
+                            ToolTip="Excluir usuário selecionado" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Painel Direito: Formulário -->
+        <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="8,8,8,8">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Cabeçalho do formulário -->
+                    <TextBlock Text="{Binding Editando, Converter={StaticResource BoolToVisibility}, ConverterParameter=Editar Usuário|Novo Usuário}"
+                               FontSize="20" FontWeight="Bold"
+                               Foreground="{DynamicResource TextBrush}"
+                               Margin="0,0,0,24" />
+
+                    <!-- Nome -->
+                    <StackPanel Margin="0,0,0,16">
+                        <TextBlock Text="Nome Completo *" Style="{StaticResource InputLabel}" />
+                        <TextBox Text="{Binding Nome, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputField}" />
+                    </StackPanel>
+
+                    <!-- Login -->
+                    <StackPanel Margin="0,0,0,16">
+                        <TextBlock Text="Login (usuário) *" Style="{StaticResource InputLabel}" />
+                        <TextBox Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputField}"
+                                 IsEnabled="{Binding Editando, Converter={StaticResource InverseBoolToVisibility}}"
+                                 ToolTip="{Binding Editando, Converter={StaticResource BoolToVisibility}, ConverterParameter=Login não pode ser alterado após criação|Login único para acesso}" />
+                    </StackPanel>
+
+                    <!-- Senha -->
+                    <StackPanel Margin="0,0,0,16">
+                        <TextBlock Text="{Binding Editando, Converter={StaticResource BoolToVisibility}, ConverterParameter=Nova Senha (deixe em branco para manter)|Senha *}"
+                                   Style="{StaticResource InputLabel}" />
+                        <PasswordBox x:Name="SenhaBox"
+                                     Style="{StaticResource PasswordField}"
+                                     PasswordChanged="SenhaBox_PasswordChanged" />
+                    </StackPanel>
+
+                    <!-- Confirmar Senha -->
+                    <StackPanel Margin="0,0,0,16">
+                        <TextBlock Text="{Binding Editando, Converter={StaticResource BoolToVisibility}, ConverterParameter=Confirmar Nova Senha|Confirmar Senha *}"
+                                   Style="{StaticResource InputLabel}" />
+                        <PasswordBox x:Name="ConfirmarSenhaBox"
+                                     Style="{StaticResource PasswordField}"
+                                     PasswordChanged="ConfirmarSenhaBox_PasswordChanged" />
+                    </StackPanel>
+
+                    <!-- Role -->
+                    <StackPanel Margin="0,0,0,16">
+                        <TextBlock Text="Perfil de Acesso *" Style="{StaticResource InputLabel}" />
+                        <ComboBox ItemsSource="{Binding RolesDisponiveis}"
+                                  SelectedItem="{Binding Role}"
+                                  ItemTemplate="{StaticResource RoleTemplate}"
+                                  Height="40"
+                                  FontSize="15"
+                                  Background="{DynamicResource SurfaceAltBrush}"
+                                  Foreground="{DynamicResource TextBrush}"
+                                  BorderBrush="{DynamicResource BorderBrushTheme}"
+                                  BorderThickness="1"
+                                  Padding="12,4" />
+                    </StackPanel>
+
+                    <!-- Status e Primeiro Login -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                        <CheckBox Content="Usuário Ativo"
+                                  IsChecked="{Binding Ativo}"
+                                  FontSize="14"
+                                  Foreground="{DynamicResource TextBrush}"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,24,0" />
+                        <CheckBox Content="Exigir troca de senha no próximo login"
+                                  IsChecked="{Binding PrimeiroLogin}"
+                                  FontSize="14"
+                                  Foreground="{DynamicResource TextBrush}"
+                                  VerticalAlignment="Center"
+                                  ToolTip="Marque para forçar o usuário a definir nova senha no primeiro acesso" />
+                    </StackPanel>
+
+                    <!-- Mensagem -->
+                    <TextBlock Text="{Binding Mensagem}"
+                               FontSize="13" FontWeight="Medium"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Margin="0,0,0,16"
+                               Visibility="{Binding Mensagem, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MensagemErro}" Value="True">
+                                        <Setter Property="Foreground" Value="#E74C3C" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding MensagemErro}" Value="False">
+                                        <Setter Property="Foreground" Value="#27AE60" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Botões -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Cancelar"
+                                Command="{Binding NovoCommand}"
+                                Style="{StaticResource SecondaryButton}"
+                                Width="120"
+                                IsEnabled="{Binding Editando, Converter={StaticResource BoolToVisibility}}"
+                                ToolTip="Limpar formulário / Novo usuário" />
+                        <Button Content="{Binding Editando, Converter={StaticResource BoolToVisibility}, ConverterParameter=💾 Atualizar|💾 Criar}"
+                                Command="{Binding SalvarCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Width="160"
+                                IsDefault="True"
+                                IsEnabled="{Binding Carregando, Converter={StaticResource InverseBoolToVisibility}}" />
+                    </StackPanel>
+
+                    <!-- Progress Bar -->
+                    <ProgressBar Height="4"
+                                 Margin="0,16,0,0"
+                                 IsIndeterminate="True"
+                                 Visibility="{Binding Carregando, Converter={StaticResource BoolToVisibility}}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="{DynamicResource AccentBrush}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>
